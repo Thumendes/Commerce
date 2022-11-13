@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique
+  password  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  cart      CartItem[]
+  orders    Order[]
+
+  @@map("users")
+}
+
+model Product {
+  id        Int         @id @default(autoincrement())
+  name      String
+  price     Float
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  photos    Photo[]
+  carts     CartItem[]
+  orders    OrderItem[]
+
+  @@map("products")
+}
+
+model Photo {
+  id        Int      @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("photos")
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cart_items")
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  userId          Int
+  status          OrderStatus @default(PENDING)
+  user            User        @relation(fields: [userId], references: [id])
+  paymentIntentId String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("order_items")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
