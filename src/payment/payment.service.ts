@@ -13,7 +13,7 @@ export class PaymentService extends Stripe {
     return await this.paymentIntents.create({
       amount: amount * 100,
       currency: 'brl',
-      payment_method_types: ['card', 'pix', 'boleto'],
+      payment_method_types: ['card', 'boleto'],
     });
   }
 }
