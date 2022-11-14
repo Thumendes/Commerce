@@ -9,7 +9,6 @@ COPY --chown=node package.json yarn.lock ./
 RUN yarn install
 
 COPY --chown=node . .
-RUN npx prisma migrate deploy
 RUN npx prisma generate
 RUN yarn run build && yarn install --production
 
